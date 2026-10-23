@@ -12,7 +12,7 @@ namespace kovalenko {
     std::string output_path;
   };
 
-  Config parse_arguments(int argc, char *argv[])
+  Config parseArguments(int argc, char *argv[])
   {
     if (argc != 4) {
       throw std::invalid_argument("Invalid number of arguments. Usage: ./lab num input output");
@@ -31,7 +31,7 @@ namespace kovalenko {
     return Config{static_cast< int >(num), argv[2], argv[3]};
   }
 
-  void read_matrix_dimensions(std::ifstream &in, int &rows, int &cols)
+  void readMatrixDimensions(std::ifstream &in, int &rows, int &cols)
   {
     if (!(in >> rows >> cols)) {
       throw std::runtime_error("Cannot read matrix dimesions or file is empty");
@@ -41,7 +41,7 @@ namespace kovalenko {
     }
   }
 
-  void read_matrix_data(std::ifstream &in, int *matrix, int total)
+  void readMatrixData(std::ifstream &in, int *matrix, int total)
   {
     for (int i = 0; i < total; ++i) {
       if (!(in >> matrix[i])) {
@@ -50,7 +50,7 @@ namespace kovalenko {
     }
   }
 
-  int find_row_with_longest_series(const int *matrix, int rows, int cols)
+  int findRowWithLongestSeries(const int *matrix, int rows, int cols)
   {
     if (rows == 0 || cols == 0) {
       return 0;
@@ -77,7 +77,7 @@ namespace kovalenko {
     return best_row;
   }
 
-  void write_result(const std::string &path, int result)
+  void writeResult(const std::string &path, int result)
   {
     std::ofstream out(path);
     if (!out) {
@@ -89,7 +89,7 @@ namespace kovalenko {
     }
   }
 
-  int run_program(const Config &config)
+  int runProgram(const Config &config)
   {
     std::ifstream in(config.input_path);
     if (!in) {
@@ -97,7 +97,7 @@ namespace kovalenko {
     }
 
     int rows = 0, cols = 0;
-    read_matrix_dimensions(in, rows, cols);
+    readMatrixDimensions(in, rows, cols);
 
     const int total = rows * cols;
     int result = 0;
@@ -108,15 +108,15 @@ namespace kovalenko {
         throw std::runtime_error("Matrix is too large for static array");
       }
       int static_matrix[kMaxSize];
-      read_matrix_data(in, static_matrix, total);
-      result = find_row_with_longest_series(static_matrix, rows, cols);
+      readMatrixData(in, static_matrix, total);
+      result = findRowWithLongestSeries(static_matrix, rows, cols);
 
     } else if (config.mode == 2) {
       int *dynamic_matrix = nullptr;
       try {
         dynamic_matrix = new int[total];
-        read_matrix_data(in, dynamic_matrix, total);
-        result = find_row_with_longest_series(dynamic_matrix, rows, cols);
+        readMatrixData(in, dynamic_matrix, total);
+        result = findRowWithLongestSeries(dynamic_matrix, rows, cols);
       } catch (...) {
         delete[] dynamic_matrix;
         throw;
@@ -124,7 +124,7 @@ namespace kovalenko {
       delete[] dynamic_matrix;
     }
 
-    write_result(config.output_path, result);
+    writeResult(config.output_path, result);
     return 0;
   }
 } // namespace kovalenko
@@ -132,8 +132,8 @@ namespace kovalenko {
 int main(int argc, char *argv[])
 {
   try {
-    const kovalenko::Config config = kovalenko::parse_arguments(argc, argv);
-    return kovalenko::run_program(config);
+    const kovalenko::Config config = kovalenko::parseArguments(argc, argv);
+    return kovalenko::runProgram(config);
   } catch (const std::invalid_argument &e) {
     std::cerr << "Error: " << e.what() << "\n";
     return 1;
